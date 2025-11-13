@@ -1,3 +1,22 @@
 fastapi
 uvicorn
 python-jobspy
+pymongo
+numpy
+google-generativeai
+python-dotenv
+httpx
+pydantic
+starlette
+pandas
+beautifulsoup4
+lxml
+requests
+
+
+# fastapi
+# uvicorn
+# python-jobspy
+# pymongo
+# numpy
+# google-generativeai
