@@ -1,0 +1,28 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment files
+.env
+*.env
+
+# Vercel build
+.vercel/
+
+# Virtual environment
+venv/
+.env/
+env/
+
+# Cache
+*.cache
+.cache/
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Byte-compiled
+*.pyc
