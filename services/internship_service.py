@@ -72,9 +72,9 @@ def fetch_and_cache_internships(title: str, location: str):
             search_term=search_str,
             google_search_term=google_term,
             location=location,
-            hours_old=24*10,            # last 3 days
+            hours_old=24*10,            # last 10 days
             country_indeed="India",
-            results_wanted=100
+            results_wanted=150
         )
 
         safe_results = fix_types(jobs_df.to_dict(orient="records"))

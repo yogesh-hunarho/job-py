@@ -8,12 +8,18 @@ router = APIRouter()
 async def resume_summary(request: Request):
     body = await request.json()
     skills = body.get("skills")
+    summary= body.get("summary")
+    isRewrite=body.get("isRewrite")
 
     if not skills or not isinstance(skills, list):
         return JSONResponse({"error": "Skills must be a list"}, status_code=400)
-
+    if isRewrite and not summary:
+        return JSONResponse(
+            {"error": "Summary is required when isRewrite is true"},
+            status_code=400
+        )
     try:
-        summaries = generate_profile_summary(skills)
+        summaries = generate_profile_summary(skills,summary,isRewrite)
         return JSONResponse({"data": summaries, "message": True},status_code=200)
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)

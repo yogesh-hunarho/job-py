@@ -13,7 +13,7 @@ def fetch_and_cache(search_term: str, location: str, country: str):
             location=location,
             country_indeed=country,
             hours_old=72,
-            results_wanted=20
+            results_wanted=60
         )
 
         safe_results = fix_types(jobs_df.to_dict(orient="records"))
