@@ -2,6 +2,7 @@ from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from routes import jobs, ai
 from services.db import cache
+from services.cleanup_service import cleanup_old_records
 
 app = FastAPI(
     title="AI Job API",

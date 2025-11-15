@@ -8,11 +8,12 @@ def fetch_and_cache(search_term: str, location: str, country: str):
     """Fetch fresh job data using JobSpy and update Mongo cache."""
     try:
         jobs_df = scrape_jobs(
-            site_name=["linkedin", "indeed", "glassdoor", "google"],
+            site_name=["indeed", "linkedin", "zip_recruiter", "google"],
             search_term=search_term,
             location=location,
             country_indeed=country,
-            results_wanted=30
+            hours_old=72,
+            results_wanted=20
         )
 
         safe_results = fix_types(jobs_df.to_dict(orient="records"))
