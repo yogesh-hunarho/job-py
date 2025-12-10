@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from routes import jobs, ai
 from services.db import cache
@@ -9,6 +11,8 @@ app = FastAPI(
     description="Job scraping + Gemini resume generator",
     version="1.0.0"
 )
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,3 +40,7 @@ app.include_router(ai.router, prefix="/api")
 @app.get("/api/status")
 def status():
     return {"status": "ok", "cached_records": cache.count_documents({})}
+
+@app.get("/project-docs", include_in_schema=False)
+async def custom_docs():
+    return FileResponse("static/custom_docs.html")

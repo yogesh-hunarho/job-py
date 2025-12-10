@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Job API - Technical Documentation</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 40px;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 15px;
+        }
+
+        h3 {
+            margin-top: 25px;
+            color: var(--text-main);
+        }
+
+        .workflow-step {
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #10b981;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .api-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8em;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .get {
+            background-color: #3b82f6;
+        }
+
+        .post {
+            background-color: #22c55e;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .param-table th,
+        .param-table td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .param-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .badge-req {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .badge-opt {
+            background-color: #dbeafe;
+            color: #1e40af;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>AI Job API Documentation</h1>
+            <p>Detailed technical documentation, workflows, and API specifications.</p>
+        </header>
+
+        <section>
+            <h2>1. System Overview</h2>
+            <p>The AI Job API is a FastAPI backend designed to:</p>
+            <ul>
+                <li><strong>Aggregate Jobs:</strong> Scrape listings from Indeed, LinkedIn, ZipRecruiter, and Google
+                    using <code>jobspy</code>.</li>
+                <li><strong>Generate Content:</strong> Use Google Gemini AI to create professional resume summaries and
+                    descriptions.</li>
+                <li><strong>Cache Data:</strong> Utilize MongoDB to store search results for performance optimization.
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>2. Workflows</h2>
+
+            <h3>A. Job Search Workflow</h3>
+            <div class="workflow-step">
+                <strong>1. Request:</strong> User sends <code>search_term</code> and <code>location</code>.
+            </div>
+            <div class="workflow-step">
+                <strong>2. Cache Check:</strong> System queries MongoDB (<code>jobs_cache</code>).
+                <ul>
+                    <li><strong>Hit:</strong> Returns cached data immediately. Triggers background refresh.</li>
+                    <li><strong>Miss:</strong> Calls <code>fetch_and_cache</code>.</li>
+                </ul>
+            </div>
+            <div class="workflow-step">
+                <strong>3. Scraping:</strong> <code>jobspy</code> scrapes multiple platforms (Indeed, LinkedIn, etc.).
+            </div>
+            <div class="workflow-step">
+                <strong>4. Storage:</strong> Results are cleaned and stored in MongoDB (TTL: 2 days).
+            </div>
+
+            <h3>B. AI Generation Workflow</h3>
+            <div class="workflow-step">
+                <strong>1. Request:</strong> User sends JSON body (e.g., skills, experience).
+            </div>
+            <div class="workflow-step">
+                <strong>2. Prompting:</strong> System constructs a prompt for Google Gemini based on input.
+            </div>
+            <div class="workflow-step">
+                <strong>3. Generation:</strong> Calls Gemini API to generate text.
+            </div>
+            <div class="workflow-step">
+                <strong>4. Response:</strong> Returns parsed JSON suggestions.
+            </div>
+        </section>
+
+        <section>
+            <h2>3. API Specifications</h2>
+
+            <!-- GET /api/jobs -->
+            <div class="api-card">
+                <h3><span class="method get">GET</span> /api/jobs</h3>
+                <p>Fetch job listings from multiple sources.</p>
+
+                <h4>Query Parameters</h4>
+                <table class="param-table">
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>search_term</code></td>
+                        <td>string</td>
+                        <td><span class="badge-req">Yes</span></td>
+                        <td>Job title or keyword (e.g., "Python Developer")</td>
+                    </tr>
+                    <tr>
+                        <td><code>location</code></td>
+                        <td>string</td>
+                        <td><span class="badge-req">Yes</span></td>
+                        <td>City or region (e.g., "New York")</td>
+                    </tr>
+                    <tr>
+                        <td><code>country_indeed</code></td>
+                        <td>string</td>
+                        <td><span class="badge-opt">No</span></td>
+                        <td>Country code (default: "India")</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- GET /api/internships -->
+            <div class="api-card">
+                <h3><span class="method get">GET</span> /api/internships</h3>
+                <p>Fetch internship listings.</p>
+
+                <h4>Query Parameters</h4>
+                <table class="param-table">
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>title</code></td>
+                        <td>string</td>
+                        <td><span class="badge-req">Yes</span></td>
+                        <td>Internship title (e.g., "Data Science")</td>
+                    </tr>
+                    <tr>
+                        <td><code>location</code></td>
+                        <td>string</td>
+                        <td><span class="badge-req">Yes</span></td>
+                        <td>City or region</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- POST /api/summary -->
+            <div class="api-card">
+                <h3><span class="method post">POST</span> /api/summary</h3>
+                <p>Generate a professional profile summary based on skills.</p>
+
+                <h4>Request Body (JSON)</h4>
+                <pre>{
+  "skills": ["python", "fastapi", "react"],
+  "summary": "Optional existing summary if rewriting",
+  "isRewrite": false
+}</pre>
+
+                <h4>Response</h4>
+                <pre>{
+  "data": ["Summary Option 1...", "Summary Option 2..."],
+  "message": true
+}</pre>
+            </div>
+
+            <!-- POST /api/internship-summary -->
+            <div class="api-card">
+                <h3><span class="method post">POST</span> /api/internship-summary</h3>
+                <p>Generate bullet points for an internship experience.</p>
+
+                <h4>Request Body (JSON)</h4>
+                <pre>{
+  "designation": "Software Intern",
+  "company": "Tech Corp",
+  "summary": "Optional existing summary",
+  "isrewrite": false
+}</pre>
+            </div>
+
+            <!-- POST /api/experience-summary -->
+            <div class="api-card">
+                <h3><span class="method post">POST</span> /api/experience-summary</h3>
+                <p>Generate bullet points for professional work experience.</p>
+
+                <h4>Request Body (JSON)</h4>
+                <pre>{
+  "designation": "Senior Developer",
+  "company": "Big Tech Inc",
+  "summary": "Optional existing summary",
+  "isrewrite": false
+}</pre>
+            </div>
+
+            <!-- POST /api/accomplishment-summary -->
+            <div class="api-card">
+                <h3><span class="method post">POST</span> /api/accomplishment-summary</h3>
+                <p>Polish or generate an accomplishment description.</p>
+
+                <h4>Request Body (JSON)</h4>
+                <pre>{
+  "title": "Won National Hackathon",
+  "description": "Optional details",
+  "isrewrite": false
+}</pre>
+            </div>
+
+        </section>
+
+        <footer>
+            <p>&copy; 2024 AI Job API Project</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>

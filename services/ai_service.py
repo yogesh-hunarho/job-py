@@ -2,11 +2,12 @@ import json
 from config import GEMINI_MODEL, GENERATION_CONFIG
 
 def generate_profile_summary(skills: list[str],summary=None, isRewrite=False):
-    """Generate profile summaries using Gemini."""
+    """Generate profile summaries using Gemini in first-person."""
 
     if isRewrite:
         prompt = f"""
-        Rewrite a 300-character professional profile summary for a student.
+        Rewrite a 300-character professional profile summary in a professional tone
+        using FIRST PERSON (use "I", not "the student").
         Skills: {", ".join(skills)}.
         Summary:{summary}
 
@@ -18,7 +19,7 @@ def generate_profile_summary(skills: list[str],summary=None, isRewrite=False):
         You are a career counselor AI helping students write profile summaries.
 
         Generate 2 professional profile summaries (each under 300 characters)
-        for a student based on the following details:
+        in a professional tone using FIRST PERSON (use "I", not "the student"). based on the following details:
 
         Skills: {", ".join(skills)}.
 
@@ -33,14 +34,17 @@ def generate_profile_summary(skills: list[str],summary=None, isRewrite=False):
     return json.loads(response.text.strip())
 
 def generate_Internship_summary(designation, company, summary=None, isRewrite=False):
-    """Generate or polish internship summaries using Gemini."""
+    """Generate or polish internship summaries using Gemini in first-person."""
 
     if isRewrite:
         prompt = f"""
         You are an expert career writing assistant.
 
         The user has written an internship summary that may contain grammatical errors or weak phrasing.
-        Your task is to polish and professionally rewrite it while keeping the meaning the same.
+        Rewrite the internship summary in a professional tone using FIRST PERSON
+        (use "I", not third-person language like "the intern").
+        
+        Keep the meaning the same and limit to 300 characters.
 
         Company: {company}
         Designation: {designation}
@@ -53,8 +57,8 @@ def generate_Internship_summary(designation, company, summary=None, isRewrite=Fa
         prompt = f"""
         You are a career counselor AI helping students write internship summaries.
 
-        Generate 2 professional internship summaries (each under 300 characters)
-        for a student based on the following details:
+        Generate 2 professional internship summaries using FIRST PERSON (use "I", not third-person language).
+        Each summary must be under 300 characters.
 
         Designation: {designation}
         Company: {company}
@@ -69,17 +73,25 @@ def generate_Internship_summary(designation, company, summary=None, isRewrite=Fa
     return json.loads(response.text.strip())
 
 def generate_Experience_summary(designation, company, summary=None, isRewrite=False, currently_working=False):
-    """Generate or polish professional experience summaries using Gemini."""
+    """Generate or polish professional experience summaries using Gemini in first-person."""
 
+    tense_rule = (
+        "Use present tense (e.g., 'developing', 'leading', 'managing') because this is a current role."
+        if currently_working
+        else "Use past tense (e.g., 'developed', 'led', 'managed') because this role has ended."
+    )
+    
     if isRewrite:
         prompt = f"""
         You are a professional career writing assistant.
 
         The user has written an experience summary that may contain grammatical or stylistic issues.
-        Please polish and rewrite it in a professional tone while keeping the same meaning.
+        Rewrite the experience summary in a clear, professional tone using FIRST PERSON (use "I", not third-person language).
 
-        - Use present tense if the person is currently working.
-        - Use past tense if the experience has ended.
+        Keep the original meaning unchanged.
+        Limit to 300 characters.
+
+        {tense_rule}
 
         Details:
         Company: {company}
@@ -91,24 +103,21 @@ def generate_Experience_summary(designation, company, summary=None, isRewrite=Fa
         ["summary"]
         """
     else:
-        tense_instruction = (
-            "Use present tense (e.g., 'developing', 'leading', 'managing') since the person is currently working."
-            if currently_working
-            else "Use past tense (e.g., 'developed', 'led', 'managed') since the experience has ended."
-        )
 
         prompt = f"""
         You are a career coach AI helping professionals write concise experience summaries.
+        Generate 2 concise, achievement-focused summaries using FIRST PERSON
+        (use "I", not third-person language).
 
-        Generate 2 professional and achievement-oriented summaries (each under 250 characters)
-        for the following role:
+        Keep the original meaning unchanged.
+        Each summary must be under 300 characters.
 
         Designation: {designation}
         Company: {company}
 
-        {tense_instruction}
+        {tense_rule}
 
-        Return 2 improved summaries (each under 300 characters) in JSON format::
+        Return 2 summaries in JSON format::
         ["summary1", "summary2"]
         """
 
